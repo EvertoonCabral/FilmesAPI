@@ -65,11 +65,15 @@ public class FilmesController : ControllerBase
 
     }
 
-    [HttpPut("id")]
-    public IActionResult atualizarFilme(int idFilme, [FromBody] UpdateFilmeDto filmeDto)
+    [HttpPut("{idFilme}")]
+    public IActionResult AtualizarFilme(int idFilme, [FromBody] UpdateFilmeDto filmeDto)
     {
+        if (filmeDto == null)
+        {
+            return BadRequest("O corpo da requisição não foi enviado.");
+        }
 
-        var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == idFilme);
+        var filme = _context.Filmes.FirstOrDefault(f => f.Id == idFilme);
 
         if (filme == null)
         {
@@ -81,6 +85,7 @@ public class FilmesController : ControllerBase
 
         return NoContent();
     }
+
 
 
     [HttpPatch("id")]

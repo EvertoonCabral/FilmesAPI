@@ -18,15 +18,26 @@ namespace FilmesApi.Controllers
             _context = context;
             _mapper = mapper;
         }
-
         [HttpPost]
         public IActionResult AdicionaSessao(CreateSessaoDto dto)
         {
+            var filme = _context.Filmes.FirstOrDefault(f => f.Id == dto.FilmeId);
+            var cinema = _context.Cinemas.FirstOrDefault(c => c.Id == dto.CinemaId);
+
+            if (filme == null || cinema == null)
+            {
+                return NotFound("Filme ou Cinema não encontrado");
+            }
+
             Sessao sessao = _mapper.Map<Sessao>(dto);
             _context.Sessoes.Add(sessao);
             _context.SaveChanges();
-            return CreatedAtAction(nameof(RecuperaSessoesPorId), new { filmeId = sessao.FilmeId, cinemaId = sessao.CinemaId }, sessao);
+
+            return CreatedAtAction(nameof(RecuperaSessoesPorId),
+                new { filmeId = sessao.FilmeId, cinemaId = sessao.CinemaId },
+                sessao);
         }
+
 
         [HttpGet]
         public IEnumerable<ReadSessaoDto> RecuperaSessoes()

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmesAPI.Migrations
 {
     [DbContext(typeof(FilmesContext))]
-    [Migration("20250413040657_CorrecaoBanco")]
-    partial class CorrecaoBanco
+    [Migration("20250413224841_CorrecaoSessao")]
+    partial class CorrecaoSessao
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -99,6 +99,12 @@ namespace FilmesAPI.Migrations
 
                     b.Property<int?>("CinemaId")
                         .HasColumnType("int");
+
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.HasKey("FilmeId", "CinemaId");
 

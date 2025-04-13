@@ -98,6 +98,12 @@ namespace FilmesAPI.Migrations
                     b.Property<int?>("CinemaId")
                         .HasColumnType("int");
 
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
                     b.HasKey("FilmeId", "CinemaId");
 
                     b.HasIndex("CinemaId");

@@ -9,7 +9,7 @@ public class UpdateFilmeDto
 
     [Required(ErrorMessage = "Titulo é obrigatorio")]
     [StringLength(50, ErrorMessage = "Tamanho maximo do titulo 50 caracteres")]
-    public int Titulo { get; set; }
+    public String Titulo { get; set; }
 
     [Required(ErrorMessage = "Genero é obrigatorio")]
     public String Genero { get; set; }

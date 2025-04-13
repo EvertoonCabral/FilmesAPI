@@ -4,7 +4,7 @@
 
 namespace FilmesAPI.Migrations
 {
-    public partial class Atualizando : Migration
+    public partial class CorrecaoBanco : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

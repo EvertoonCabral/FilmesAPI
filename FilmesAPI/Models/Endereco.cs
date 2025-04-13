@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FilmesAPI.Models
 {
@@ -6,6 +7,7 @@ namespace FilmesAPI.Models
     {
         [Key]
         [Required]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public String Logradouro { get; set; }
         public int Numero { get; set; }

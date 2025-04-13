@@ -8,8 +8,8 @@ namespace FilmesAPI.Data.Dtos
         [Required(ErrorMessage = "O campo nome é obrigatorio")]
         public String Nome { get; set; }
 
-        public int EnderecoId { get; set; }
-
+        [Required(ErrorMessage = "O campo endereço é obrigatorio")]
+        public CreateEnderecoDto Endereco { get; set; }
 
     }
 }

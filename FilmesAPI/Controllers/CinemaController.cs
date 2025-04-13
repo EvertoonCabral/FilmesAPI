@@ -7,9 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FilmesAPI.Controllers
 {
+    
     [ApiController]
     [Route("[controller]")]
-
     public class CinemaController : ControllerBase
     {
         private FilmesContext _context;
@@ -31,20 +31,26 @@ namespace FilmesAPI.Controllers
             return CreatedAtAction(nameof(RecuperaCinemasPorId), new { Id = cinema.Id }, cinemaDto);
         }
 
+     
+
+
         [HttpGet]
         public IEnumerable<ReadCinemaDto> RecuperaCinemas([FromQuery] int? enderecoId = null)
         {
-            if(enderecoId == null)
+            IQueryable<Cinema> cinemasQuery = _context.Cinemas
+                .Include(c => c.Endereco)
+                .Include(c => c.Sessoes);
+
+            if (enderecoId != null)
             {
-                return _mapper.Map<List<ReadCinemaDto>>(_context.Cinemas.ToList());
+                cinemasQuery = cinemasQuery.Where(c => c.EnderecoId == enderecoId);
             }
-            return _mapper.Map<List<ReadCinemaDto>>
-                (_context.Cinemas.FromSqlRaw
-                ($"SELECT" +
-                $" Id, Nome, EnderecoId " +
-                $"FROM cinemas" +
-                $" where cinemas.EnderecoId = {enderecoId}").ToList());
+
+            var cinemas = cinemasQuery.ToList();
+            return _mapper.Map<List<ReadCinemaDto>>(cinemas);
         }
+
+
 
         [HttpGet("{id}")]
         public IActionResult RecuperaCinemasPorId(int id)

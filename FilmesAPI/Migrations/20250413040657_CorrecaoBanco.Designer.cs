@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FilmesAPI.Migrations
 {
     [DbContext(typeof(FilmesContext))]
-    [Migration("20250412171738_Atualizando")]
-    partial class Atualizando
+    [Migration("20250413040657_CorrecaoBanco")]
+    partial class CorrecaoBanco
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

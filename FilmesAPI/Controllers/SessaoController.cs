@@ -33,9 +33,12 @@ namespace FilmesApi.Controllers
             _context.Sessoes.Add(sessao);
             _context.SaveChanges();
 
+            var readDto = _mapper.Map<ReadSessaoDto>(sessao);
+
+
             return CreatedAtAction(nameof(RecuperaSessoesPorId),
                 new { filmeId = sessao.FilmeId, cinemaId = sessao.CinemaId },
-                sessao);
+                readDto);
         }
 
 

@@ -4,6 +4,7 @@ using FilmesAPI.Data.Dtos;
 using FilmesAPI.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace FilmesAPI.Controllers;
 
@@ -36,18 +37,63 @@ public class FilmesController : ControllerBase
     }
 
     [HttpGet]
-    public IEnumerable<ReadFilmeDto> recuperaFilmes([FromQuery] int skip = 0,
+    public IActionResult recuperaFilmes([FromQuery] int skip = 0,
         [FromQuery] int take = 50,
         [FromQuery] string? nomeCinema = null)
     {
-        if (nomeCinema == null)
+        try
         {
-        return _mapper.Map<List<ReadFilmeDto>>(_context.Filmes.Skip(skip).Take(take).ToList());
+            if (string.IsNullOrEmpty(nomeCinema))
+            {
+                var filmesSemFiltro = _context.Filmes
+                    .Include(f => f.Sessoes)
+                    .Skip(skip)
+                    .Take(take)
+                    .ToList();
+
+                return Ok(_mapper.Map<List<ReadFilmeDto>>(filmesSemFiltro));
+            }
+
+            var filmes = _context.Filmes
+                .Include(f => f.Sessoes)
+                    .ThenInclude(s => s.Cinema)
+                .Where(filme => filme.Sessoes.Any(sessao =>
+                    sessao.Cinema.Nome.ToLower() == nomeCinema.ToLower()))
+                .OrderBy(f=> f.Id)
+                .Skip(skip)
+                .Take(take)
+                .ToList();
+
+            if (filmes.Count == 0)
+            {
+                var cinemaExiste = _context.Cinemas
+                    .Any(c => c.Nome.ToLower() == nomeCinema.ToLower());
+
+                if (!cinemaExiste)
+                {
+                    return NotFound($"Nenhum cinema encontrado com o nome '{nomeCinema}'");
+                }
+
+                var sessoesDoCinema = _context.Sessoes
+                    .Include(s => s.Cinema)
+                    .Where(s => s.Cinema.Nome.ToLower() == nomeCinema.ToLower())
+                    .ToList();
+
+                if (sessoesDoCinema.Count == 0)
+                {
+                    return NotFound($"O cinema '{nomeCinema}' existe, mas não tem sessões cadastradas");
+                }
+
+                return NotFound($"O cinema '{nomeCinema}' tem {sessoesDoCinema.Count} sessões, mas nenhum filme correspondente aos critérios");
+            }
+
+            return Ok(_mapper.Map<List<ReadFilmeDto>>(filmes));
         }
-        return _mapper.Map<List<ReadFilmeDto>>(_context.Filmes.Skip(skip).Take(take)
-            .Where(filme => filme.Sessoes.Any(sessao => sessao.Cinema.Nome == nomeCinema)).ToList());
-
-
+        catch (Exception ex)
+        {
+            // Log a exceção
+            return StatusCode(500, $"Erro interno: {ex.Message}");
+        }
     }
 
 
@@ -56,6 +102,7 @@ public class FilmesController : ControllerBase
     {
         
         var filme = _context.Filmes.FirstOrDefault(filme => filme.Id == id);
+
         if (filme == null) return NotFound();
 
         var filmeDto = _mapper.Map<ReadFilmeDto>(filme);
